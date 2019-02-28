@@ -22,6 +22,25 @@ connection.query('SHOW DATABASES', function(err, rows, fields) {
 connection.end()
 console.log("All done now");
 
+function processDBFs(dbfs){ // Asynchronous row handler
+    for(var index in dbfs){
+        var dbf = dbfs[index].Database;
+        var sql = 'SHOW TABLES IN '+dbf;
+        data[dbf] = Number.POSITIVE_INFINITY; //Exists, but not set.
+        connection.query(sql, (function(dbf){
+            return function(err,tables,fields){
+                if(err){
+                    console.log('Error finding tables in dbf '+ dbf);
+                    connection.end();
+                } else {
+                    processTables(tables,dbf);
+                }
+            };
+        })(dbf));
+    } // do NOT put a connection.end() here.  It will kill all queued queries.
+}
+
+
 function processTables(tables,dbf){ // Asynchronous row handler
     data[dbf] = tables.length; // Now it is set.
     processed[dbf] = 0;        // And has not yet been used as a label.
