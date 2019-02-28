@@ -22,6 +22,8 @@ connection.query('SHOW DATABASES', function(err, rows, fields) {
 connection.end()
 console.log("All done now");
 
+
+
 function processDBFs(dbfs){ // Asynchronous row handler
     for(var index in dbfs){
         var dbf = dbfs[index].Database;
@@ -39,7 +41,6 @@ function processDBFs(dbfs){ // Asynchronous row handler
         })(dbf));
     } // do NOT put a connection.end() here.  It will kill all queued queries.
 }
-
 
 function processTables(tables,dbf){ // Asynchronous row handler
     data[dbf] = tables.length; // Now it is set.
@@ -61,4 +62,18 @@ function processTables(tables,dbf){ // Asynchronous row handler
             })(table,dbf));
         }
     }
+}
+
+function processDescription(desc,table,dbf){
+    data[dbf]--; //Processed one table
+    if(processed[dbf]==0){
+        processed[dbf] = 1
+        console.log('---|'+dbf+'>');
+    }
+    console.log('.....|'+dbf+'.'+table+'>');
+    desc.map(function(field){ // show the fields nicely
+        console.log("\tFieldName: `"+field.Field+"` \t("+field.Type+")");
+    });
+
+    if(allZero(data)){connection.end()}
 }
