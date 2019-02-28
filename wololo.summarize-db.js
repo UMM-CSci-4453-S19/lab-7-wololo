@@ -70,3 +70,11 @@ function processDescription(desc,table,dbf){
 
     if(allZero(data)){connection.end()}
 }
+
+function allZero(object){
+    allzero = true;
+    for(obj in object){
+        if(object[obj]!=0){allzero = false}
+    }
+    return(allzero);
+}
